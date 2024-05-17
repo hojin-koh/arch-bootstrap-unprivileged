@@ -1,0 +1,16 @@
+diff -daur pacman.orig/scripts/libmakepkg/lint_package/build_references.sh.in pacman/scripts/libmakepkg/lint_package/build_references.sh.in
+--- pacman.orig/scripts/libmakepkg/lint_package/build_references.sh.in	2024-05-17 07:32:29.470757000 +0000
++++ pacman/scripts/libmakepkg/lint_package/build_references.sh.in	2024-05-17 07:32:35.114611000 +0000
+@@ -38,12 +38,5 @@
+ 		fi
+ 	done
+ 
+-	# Check for Windows-style MSYS2 root path
+-	if find "${pkgdir}" -type f -print0 | xargs -0 grep -iFqI "$(cygpath -m /)" ; then
+-		warning "$(gettext "Package contains reference to %s")" "\$(cygpath -m /)"
+-	fi
+-	if find "${pkgdir}" -type f -print0 | xargs -0 grep -iFqI "$(cygpath -w /)" ; then
+-		warning "$(gettext "Package contains reference to %s")" "\$(cygpath -w /)"
+-	fi
+ 	return 0
+ }

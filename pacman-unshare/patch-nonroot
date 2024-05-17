@@ -1,0 +1,87 @@
+diff -daur pacman-6.0.1/lib/libalpm/add.c pacman-6.0.1.new/lib/libalpm/add.c
+--- pacman-6.0.1/lib/libalpm/add.c	2021-09-04 17:42:20.344308000 +0800
++++ pacman-6.0.1.new/lib/libalpm/add.c	2021-11-05 23:13:48.893874600 +0800
+@@ -115,8 +115,7 @@
+ {
+ 	int ret;
+ 	struct archive *archive_writer;
+-	const int archive_flags = ARCHIVE_EXTRACT_OWNER |
+-	                          ARCHIVE_EXTRACT_PERM |
++	const int archive_flags = ARCHIVE_EXTRACT_PERM |
+ 	                          ARCHIVE_EXTRACT_TIME |
+ 	                          ARCHIVE_EXTRACT_UNLINK |
+ 	                          ARCHIVE_EXTRACT_XATTR |
+@@ -252,7 +251,6 @@
+ #if 0
+ 		uid_t entryuid = archive_entry_uid(entry);
+ 		gid_t entrygid = archive_entry_gid(entry);
+-#endif
+ 
+ 		/* case 6: existing dir, ignore it */
+ 		if(lsbuf.st_mode != entrymode) {
+@@ -267,7 +265,6 @@
+ 					entrymode & mask);
+ 		}
+ 
+-#if 0
+ 		/* Disable this warning until our user management in packages has improved.
+ 		   Currently many packages have to create users in post_install and chown the
+ 		   directories. These all resulted in "false-positive" warnings. */
+diff -daur pacman-6.1.0/lib/libalpm/util.c pacman-6.1.0.new/lib/libalpm/util.c
+--- msys2-pacman-6.1.0/lib/libalpm/util.c	2024-03-04 11:07:58.000000000 +0800
++++ msys2-pacman-6.1.0.new/lib/libalpm/util.c	2024-05-16 23:33:59.688965200 +0800
+@@ -657,10 +657,10 @@
+ 		/* use fprintf instead of _alpm_log to send output through the parent */
+ 		/* don't chroot() to "/": this allows running with less caps when the
+ 		 * caller puts us in the right root */
+-		if(strcmp(handle->root, "/") != 0 && chroot(handle->root) != 0) {
++		/* if(strcmp(handle->root, "/") != 0 && chroot(handle->root) != 0) {
+ 			fprintf(stderr, _("could not change the root directory (%s)\n"), strerror(errno));
+ 			exit(1);
+-		}
++		} */
+ 		if(chdir("/") != 0) {
+ 			fprintf(stderr, _("could not change directory to %s (%s)\n"),
+ 					"/", strerror(errno));
+@@ -800,7 +800,7 @@
+  */
+ int _alpm_ldconfig(alpm_handle_t *handle)
+ {
+-	char line[PATH_MAX];
++	/*char line[PATH_MAX];
+ 
+ 	_alpm_log(handle, ALPM_LOG_DEBUG, "running ldconfig\n");
+ 
+@@ -813,7 +813,7 @@
+ 			strcpy(arg0, "ldconfig");
+ 			return _alpm_run_chroot(handle, LDCONFIG, argv, NULL, NULL);
+ 		}
+-	}
++	}*/
+ 
+ 	return 0;
+ }
+diff -daur orig/src/pacman/check.c new/src/pacman/check.c
+--- orig/src/pacman/check.c	2024-05-17 07:25:14.506777000 +0000
++++ new/src/pacman/check.c	2024-05-17 07:27:51.737545310 +0000
+@@ -75,7 +75,7 @@
+ 	int errors = 0;
+ 	mode_t fsmode;
+ 
+-#ifndef __MSYS__
++#if 0
+ 	/* uid */
+ 	if(st->st_uid != archive_entry_uid(entry)) {
+ 		errors++;
+diff -daur orig/src/pacman/pacman.c new/src/pacman/pacman.c
+--- orig/src/pacman/pacman.c	2024-05-17 07:25:14.506014000 +0000
++++ new/src/pacman/pacman.c	2024-05-17 07:28:17.929584077 +0000
+@@ -1163,7 +1163,7 @@
+ 		cleanup(ret);
+ 	}
+ 
+-#ifndef __MSYS__
++#if 0
+ 	/* check if we have sufficient permission for the requested operation */
+ 	if(myuid > 0 && needs_root()) {
+ 		pm_printf(ALPM_LOG_ERROR, _("you cannot perform this operation unless you are root.\n"));

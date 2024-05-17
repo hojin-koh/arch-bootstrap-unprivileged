@@ -1,0 +1,118 @@
+diff -daur pacman-6.0.1/src/pacman/callback.c pacman-6.0.1.new/src/pacman/callback.c
+--- pacman-6.0.1/src/pacman/callback.c	2021-09-04 17:42:20.370974500 +0800
++++ pacman-6.0.1.new/src/pacman/callback.c	2021-11-05 23:11:19.841352700 +0800
+@@ -260,15 +260,15 @@
+ 			printf(_("checking dependencies...\n"));
+ 			break;
+ 		case ALPM_EVENT_FILECONFLICTS_START:
+-			if(config->noprogressbar) {
+-				printf(_("checking for file conflicts...\n"));
+-			}
++			/*if(config->noprogressbar) {                           */
++			/*        printf(_("checking for file conflicts...\n"));*/
++			/*}                                                     */
+ 			break;
+ 		case ALPM_EVENT_RESOLVEDEPS_START:
+-			printf(_("resolving dependencies...\n"));
++			//printf(_("resolving dependencies...\n"));
+ 			break;
+ 		case ALPM_EVENT_INTERCONFLICTS_START:
+-			printf(_("looking for conflicting packages...\n"));
++			//printf(_("looking for conflicting packages...\n"));
+ 			break;
+ 		case ALPM_EVENT_TRANSACTION_START:
+ 			colon_printf(_("Processing package changes...\n"));
+@@ -313,22 +313,22 @@
+ 			}
+ 			break;
+ 		case ALPM_EVENT_INTEGRITY_START:
+-			if(config->noprogressbar) {
+-				printf(_("checking package integrity...\n"));
+-			}
++			/*if(config->noprogressbar) {                          */
++			/*        printf(_("checking package integrity...\n"));*/
++			/*}                                                    */
+ 			break;
+ 		case ALPM_EVENT_KEYRING_START:
+-			if(config->noprogressbar) {
+-				printf(_("checking keyring...\n"));
+-			}
++			/*if(config->noprogressbar) {                */
++			/*        printf(_("checking keyring...\n"));*/
++			/*}                                          */
+ 			break;
+ 		case ALPM_EVENT_KEY_DOWNLOAD_START:
+ 			printf(_("downloading required keys...\n"));
+ 			break;
+ 		case ALPM_EVENT_LOAD_START:
+-			if(config->noprogressbar) {
+-				printf(_("loading package files...\n"));
+-			}
++			/*if(config->noprogressbar) {                     */
++			/*        printf(_("loading package files...\n"));*/
++			/*}                                               */
+ 			break;
+ 		case ALPM_EVENT_SCRIPTLET_INFO:
+ 			fputs(event->scriptlet_info.line, stdout);
+@@ -348,9 +348,9 @@
+ 			}
+ 			break;
+ 		case ALPM_EVENT_DISKSPACE_START:
+-			if(config->noprogressbar) {
+-				printf(_("checking available disk space...\n"));
+-			}
++			/*if(config->noprogressbar) {                             */
++			/*        printf(_("checking available disk space...\n"));*/
++			/*}                                                       */
+ 			break;
+ 		case ALPM_EVENT_OPTDEP_REMOVAL:
+ 			{
+diff -daur pacman-6.0.1/src/pacman/sync.c pacman-6.0.1.new/src/pacman/sync.c
+--- pacman-6.0.1/src/pacman/sync.c	2021-09-04 17:42:20.380974300 +0800
++++ pacman-6.0.1.new/src/pacman/sync.c	2021-11-05 23:11:19.843352100 +0800
+@@ -812,7 +812,7 @@
+ 	}
+
+ 	display_targets();
+-	printf("\n");
++	//printf("\n");
+
+ 	int confirm;
+ 	if(config->op_s_downloadonly) {
+diff -daur pacman-6.1.0/src/pacman/upgrade.c pacman-6.1.0.new/src/pacman/upgrade.c
+--- pacman-6.1.0/src/pacman/upgrade.c	2024-05-16 11:07:58.000000000 +0800
++++ pacman-6.1.0.new/src/pacman/upgrade.c 	2024-05-16 23:26:30.346171000 +0800
+@@ -99,9 +99,9 @@
+ 		goto fail_free;
+ 	}
+
+-	if(!config->print) {
+-		printf(_("loading packages...\n"));
+-	}
++	//if(!config->print) {
++	//	printf(_("loading packages...\n"));
++	//}
+ 	retval |= load_packages(local_targets, alpm_option_get_local_file_siglevel(config->handle));
+ 	retval |= load_packages(fetched_files, alpm_option_get_remote_file_siglevel(config->handle));
+
+diff -daur pacman-6.0.1/src/pacman/util.c pacman-6.0.1.new/src/pacman/util.c
+--- pacman-6.0.1/src/pacman/util.c	2021-09-04 17:42:20.380974300 +0800
++++ pacman-6.0.1.new/src/pacman/util.c	2021-11-05 23:11:19.845283400 +0800
+@@ -934,7 +934,7 @@
+
+ 	/* print to screen */
+ 	pm_asprintf(&str, "%s (%zu)", _("Packages"), alpm_list_count(targets));
+-	printf("\n");
++	//printf("\n");
+
+ 	cols = getcols();
+ 	if(verbose) {
+@@ -946,7 +946,7 @@
+ 	} else {
+ 		list_display(str, names, cols);
+ 	}
+-	printf("\n");
++	//printf("\n");
+
+ 	table_free(header, rows);
+ 	FREELIST(names);

@@ -1,0 +1,89 @@
+# Adapted from https://github.com/msys2/MSYS2-packages/blob/master/pacman/PKGBUILD
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Contributor: Martell Malone <martellmalone@gmail.com>
+# Contributor: Ray Donnelly <mingw.android@gmail.com>
+
+pkgname=pacman-unshare
+epoch=10
+pkgver=6.1.0
+pkgrel=20240509
+pkgdesc="A library-based package manager with dependency support (MSYS2 port - Brooloonu port)"
+arch=('x86_64')
+provides=("pacman=$pkgver")
+conflicts=("pacman")
+depends=(
+  'bash'
+  'glibc'
+  'libarchive'
+  'curl'
+  'gpgme'
+  'pacman-mirrorlist'
+  'gettext'
+  'gawk'
+  'coreutils'
+  'gnupg'
+  'grep'
+)
+makedepends=(
+  'meson'
+)
+backup=("etc/pacman.conf" "etc/makepkg.conf")
+url="https://www.archlinux.org/pacman/"
+url="https://github.com/msys2/msys2-pacman"
+_commit="761a878373f16db3c1825d1e8eea4c5167c36057"
+source=(
+  "pacman-$_commit.tar.gz::https://github.com/msys2/msys2-pacman/archive/${_commit}.tar.gz"
+  "pacman.conf"
+  "makepkg.conf"
+  "patch-messages" # Our patch for shorter messages
+  "patch-nonroot"  # Our patch for non-root things
+  "patch-uncygwin" # Unpatch some msys2 things we do not need
+)
+
+prepare() {
+  cd "$srcdir/msys2-pacman-$_commit"
+
+  patch -Nlp1 -i "$srcdir/patch-messages"
+  patch -Nlp1 -i "$srcdir/patch-nonroot"
+  patch -Nlp1 -i "$srcdir/patch-uncygwin"
+}
+
+build() {
+  cd "$srcdir/msys2-pacman-$_commit"
+
+  meson setup build-${CARCH} \
+    --buildtype=release \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    -Ddoc=disabled \
+    -Ddoxygen=disabled \
+    -Dgpgme=enabled \
+    -Dcurl=enabled \
+    -Duse-git-version=false \
+    -Dpkg-ext=.pkg.tar.xz \
+    -Dscriptlet-shell=/usr/bin/bash
+
+  meson compile -C build-${CARCH}
+}
+
+package() {
+  cd "$srcdir/msys2-pacman-$_commit"
+
+  DESTDIR=${pkgdir} meson install -C build-${CARCH}
+
+  # install config files
+  install -dm755 ${pkgdir}/etc
+  install -m644 ${srcdir}/makepkg.conf ${pkgdir}/etc/
+  install -m644 ${srcdir}/pacman.conf ${pkgdir}/etc/pacman.conf
+
+  install -dm755 "$pkgdir/etc/pacman.d/custom"
+  touch "$pkgdir/etc/pacman.d/custom/empty"
+}
+
+sha256sums=('cc71e919cb082221ac7d2172ba35fc29adf7b462ecb3400557fa8510d4e65426'
+            'baa91ab634c24dc024093a8a443ecfbd31aa9ae7f8ba97e825fc6301de865255'
+            '029052629ddee75d18f6f172a76c1dbda6b9695edb8c48d76b81426c6912ed2b'
+            'c85f71039f3a45c39a489a1aedda588b521622cba09eecd584ea82e04ff3d911'
+            '6fd347b9ebe9d0e4d986ef5f10d583e800546657e76bad3688d80ef42a7ecaa6'
+            '698cf442077dd65c3ecc425964dcbb85e0476982e2a76820f782a9ea3a2d25ed')
