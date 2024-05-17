@@ -123,9 +123,7 @@ configure_minimal_system() {
 
   rm -f "$DEST/etc/mtab"
   echo "rootfs / rootfs rw 0 0" > "$DEST/etc/mtab"
-  test -e "$DEST/dev/null" || mknod "$DEST/dev/null" c 1 3
-  test -e "$DEST/dev/random" || mknod -m 0644 "$DEST/dev/random" c 1 8
-  test -e "$DEST/dev/urandom" || mknod -m 0644 "$DEST/dev/urandom" c 1 9
+  # No need to deal with /dev nodes, since we're going to just mount it
 
   sed -i "s/^[[:space:]]*\(CheckSpace\)/# \1/" "$DEST/etc/pacman.conf"
   sed -i "s/^[[:space:]]*SigLevel[[:space:]]*=.*$/SigLevel = Never/" "$DEST/etc/pacman.conf"
@@ -167,7 +165,7 @@ configure_static_qemu() {
 install_packages() {
   local ARCH=$1 DEST=$2 PACKAGES=$3
   debug "install packages: $PACKAGES"
-  LC_ALL=C chroot "$DEST" /usr/bin/pacman \
+  LC_ALL=C $bwrap --unshare-user --uid 0 --gid 0 --bind "$DEST" / --proc /proc --dev /dev /usr/bin/pacman \
     --noconfirm --arch $ARCH -Sy --overwrite \* $PACKAGES
 }
 
@@ -208,6 +206,19 @@ main() {
   debug "destination directory: $DEST"
   debug "core repository: $REPO"
   debug "temporary directory: $DOWNLOAD_DIR"
+
+  # Find bubblewrap
+  local bwrap=
+  if command -v ./bwrap >/dev/null; then
+    bwrap=./bwrap
+  elif command -v bubblewrap/bwrap >/dev/null; then
+    bwrap=bubblewrap/bwrap
+  elif command -v bwrap >/dev/null; then
+    bwrap=bwrap
+  else
+    debug "Error: bubblewrap not found in the system, this directory, or the bubblewrap/ subdirectory."
+    exit 1
+  fi
   
   # Fetch packages, install system and do a minimal configuration
   mkdir -p "$DEST"
@@ -222,8 +233,8 @@ main() {
   
   debug "Done!"
   debug 
-  debug "You may now chroot or arch-chroot from package arch-install-scripts:"
-  debug "$ sudo arch-chroot $DEST"
+  debug "You may now unshare or bubblewrap into the system:"
+  debug "$ bwrap --unshare-user --uid 0 --gid 0 --bind $DEST / --proc /proc --dev /dev /bin/bash -li"
 }
 
 main "$@"
