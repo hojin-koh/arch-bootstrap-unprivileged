@@ -1,4 +1,4 @@
-FROM alpine:3.13.11
+FROM alpine:3.21
 
 RUN apk add --no-cache --update g++ gcc meson make cmake samurai perl m4 autoconf automake sed file bash curl libarchive-tools patch pkgconf gzip linux-headers \
   && export _prefix=/build \
@@ -7,8 +7,8 @@ RUN apk add --no-cache --update g++ gcc meson make cmake samurai perl m4 autocon
   && export CPPFLAGS="-I$_prefix/include" \
   && export LDFLAGS="-s -Wl,-O3 -static-libgcc -static -Wl,-static -Wl,--no-dynamic-linker -L$_prefix/include" \
   && export PKG_CONFIG_PATH=$_prefix/lib/pkgconfig/ \
-  && export _ver_libcap=2.69 \
-  && export _ver_bubblewrap=0.9.0 \
+  && export _ver_libcap=2.73 \
+  && export _ver_bubblewrap=0.11.0 \
   && curl -LJkO "https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-$_ver_libcap.tar.xz" \
   && curl -LJkO "https://github.com/containers/bubblewrap/releases/download/v$_ver_bubblewrap/bubblewrap-$_ver_bubblewrap.tar.xz" \
   && tar xf libcap-$_ver_libcap.tar.xz \
